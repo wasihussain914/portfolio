@@ -1,0 +1,17 @@
+{
+  "name": "wasi-hussain-portfolio",
+  "version": "1.0.0",
+  "description": "Flashy 3D personal portfolio for Wasi Hussain — Three.js, vanilla JS, zero frameworks.",
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "serve": "python3 -m http.server 8080",
+    "test": "playwright test",
+    "test:install": "playwright install chromium"
+  },
+  "author": "Syed W. (Wasi) Hussain",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.44.0"
+  }
+}

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wasi Hussain — CS + Applied Math @ Vanderbilt</title>
+  <meta name="description" content="Wasi Hussain — Machine Learning Engineer, Full-Stack Builder, and Cybersecurity Researcher at Vanderbilt. Award-winning hackathon projects, DARPA CASTLE research, and shipped products." />
+  <meta name="author" content="Syed W. (Wasi) Hussain" />
+
+  <meta name="theme-color" content="#05060a" />
+  <meta name="keywords" content="Wasi Hussain, Syed Hussain, Vanderbilt, machine learning engineer, cybersecurity, DARPA CASTLE, full-stack, portfolio, hackathon" />
+  <link rel="canonical" href="https://wasihussain914.github.io/" />
+
+  <!-- Open Graph / social -->
+  <meta property="og:title" content="Wasi Hussain — Portfolio" />
+  <meta property="og:description" content="ML Engineer · Full-Stack Builder · Cybersecurity Researcher @ Vanderbilt. $165K+ in hackathon winnings, 18+ shipped projects." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="og.png" />
+  <meta property="og:url" content="https://wasihussain914.github.io/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Wasi Hussain — Portfolio" />
+  <meta name="twitter:description" content="ML Engineer · Full-Stack Builder · Cybersecurity Researcher @ Vanderbilt. $165K+ in hackathon winnings." />
+  <meta name="twitter:image" content="og.png" />
+
+  <!-- Structured data for search engines -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Syed W. (Wasi) Hussain",
+    "alternateName": "Wasi Hussain",
+    "url": "https://wasihussain914.github.io/",
+    "jobTitle": "Machine Learning Engineer & Cybersecurity Researcher",
+    "email": "mailto:wasi.hussain914@gmail.com",
+    "alumniOf": [
+      { "@type": "CollegeOrUniversity", "name": "Vanderbilt University" },
+      { "@type": "CollegeOrUniversity", "name": "Rochester Institute of Technology" }
+    ],
+    "worksFor": { "@type": "Organization", "name": "Vanderbilt ISIS — DARPA CASTLE" },
+    "knowsAbout": ["Machine Learning", "Cybersecurity", "Cloud Computing", "Full-Stack Development", "Reinforcement Learning"],
+    "sameAs": ["https://github.com/wasihussain914", "https://www.linkedin.com/in/wasihussain914"]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23050609'/%3E%3Ctext x='50' y='68' font-size='58' font-family='Space Grotesk,sans-serif' font-weight='700' text-anchor='middle' fill='%237c5cff'%3EW%3C/text%3E%3C/svg%3E" />
+
+  <!-- Three.js via import map (loaded as an ES module in js/scene.js) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <!-- Custom cursor -->
+  <div class="cursor" id="cursor" aria-hidden="true"></div>
+  <div class="cursor-dot" id="cursor-dot" aria-hidden="true"></div>
+
+  <!-- Scroll progress bar -->
+  <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+
+  <!-- Loading overlay -->
+  <div class="loader" id="loader">
+    <div class="loader-inner">
+      <div class="loader-cube">
+        <div></div><div></div><div></div>
+        <div></div><div></div><div></div>
+      </div>
+      <div class="loader-text">Initializing<span class="dots"></span></div>
+    </div>
+  </div>
+
+  <!-- 3D hero canvas (fixed, full-viewport background) -->
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <!-- Navigation -->
+  <nav class="nav" id="nav">
+    <a href="#hero" class="nav-brand" data-hover>WH<span class="brand-dot">.</span></a>
+    <div class="nav-links">
+      <a href="#about" data-hover>About</a>
+      <a href="#experience" data-hover>Experience</a>
+      <a href="#projects" data-hover>Projects</a>
+      <a href="#skills" data-hover>Skills</a>
+      <a href="#contact" data-hover>Contact</a>
+    </div>
+    <button class="nav-cmdk" id="cmdk-trigger" aria-label="Open command palette" data-hover><span>⌘</span>K</button>
+    <a href="assets/resume.pdf" class="nav-cta" target="_blank" rel="noopener" data-hover>Résumé ↗</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </nav>
+
+  <!-- Accent theme switcher -->
+  <div class="accent-switcher" id="accent-switcher" aria-label="Accent colour" role="group"></div>
+
+  <main>
+    <!-- ================= HERO ================= -->
+    <section class="hero" id="hero">
+      <div class="hero-content">
+        <p class="hero-eyebrow reveal">Hi, I'm</p>
+        <h1 class="hero-name reveal" id="hero-name">Wasi Hussain</h1>
+        <div class="hero-roles reveal">
+          <span class="role-static">I'm a</span>
+          <span class="role-rotator" id="role-rotator" aria-live="polite"></span>
+        </div>
+        <p class="hero-blurb reveal" id="hero-blurb"></p>
+        <div class="hero-actions reveal">
+          <a class="btn btn-primary" href="#projects" data-hover>View Work</a>
+          <a class="btn btn-ghost" id="link-github" target="_blank" rel="noopener" data-hover>GitHub ↗</a>
+          <a class="btn btn-ghost" id="link-linkedin" target="_blank" rel="noopener" data-hover>LinkedIn ↗</a>
+        </div>
+        <div class="hero-stats reveal" id="hero-stats"></div>
+      </div>
+      <a href="#about" class="scroll-hint" aria-label="Scroll down" data-hover>
+        <span>scroll</span><span class="scroll-arrow"></span>
+      </a>
+    </section>
+
+    <!-- ================= ABOUT ================= -->
+    <section class="section about" id="about">
+      <div class="section-head reveal">
+        <span class="section-index">01</span>
+        <h2 class="section-title">About</h2>
+      </div>
+      <div class="about-grid">
+        <div class="about-text reveal">
+          <p id="about-blurb"></p>
+          <p class="about-sub">Based in <strong id="about-location"></strong> · open to Summer 2027 internships in ML, cloud, security, and full-stack.</p>
+          <div class="about-links" id="about-links"></div>
+        </div>
+        <div class="about-edu reveal" id="about-edu"></div>
+      </div>
+    </section>
+
+    <!-- ================= EXPERIENCE ================= -->
+    <section class="section experience" id="experience">
+      <div class="section-head reveal">
+        <span class="section-index">02</span>
+        <h2 class="section-title">Experience</h2>
+      </div>
+      <div class="timeline" id="timeline"></div>
+    </section>
+
+    <!-- ================= PROJECTS ================= -->
+    <section class="section projects" id="projects">
+      <div class="section-head reveal">
+        <span class="section-index">03</span>
+        <h2 class="section-title">Projects</h2>
+        <p class="section-subtitle">Every real thing I've shipped — filter by what you care about, then click any card for the full story.</p>
+      </div>
+      <div class="awards-ribbon reveal" aria-hidden="true"><div class="awards-track" id="awards-track"></div></div>
+      <div class="filters" id="filters"></div>
+      <div class="project-grid" id="project-grid"></div>
+    </section>
+
+    <!-- ================= SKILLS ================= -->
+    <section class="section skills" id="skills">
+      <div class="section-head reveal">
+        <span class="section-index">04</span>
+        <h2 class="section-title">Skills</h2>
+      </div>
+      <div class="skills-grid">
+        <div class="skills-sphere-wrap reveal">
+          <canvas id="skills-canvas"></canvas>
+        </div>
+        <div class="skills-bars reveal" id="skills-bars"></div>
+      </div>
+    </section>
+
+    <!-- ================= CONTACT ================= -->
+    <section class="section contact" id="contact">
+      <div class="section-head reveal">
+        <span class="section-index">05</span>
+        <h2 class="section-title">Let's build something</h2>
+      </div>
+      <div class="contact-body reveal">
+        <p class="contact-lead">Recruiting, research, or just want to talk shop? My inbox is open.</p>
+        <a class="contact-email" id="contact-email" data-hover></a>
+        <div class="contact-links" id="contact-links"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span id="footer-name"></span>
+    <span class="footer-built">Built with Three.js, vanilla JS, and zero frameworks. <a href="https://github.com/wasihussain914" target="_blank" rel="noopener" data-hover>Source ↗</a></span>
+  </footer>
+
+  <!-- App logic -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
