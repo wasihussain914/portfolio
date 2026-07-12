@@ -283,6 +283,30 @@ function initScroll() {
   }, { rootMargin: "-45% 0px -50% 0px" });
   sections.forEach((s) => sio.observe(s));
 
+  // Vertical section-dot navigator — mirrors the nav links, tracks scroll.
+  const dotsNav = $("#dots-nav");
+  if (dotsNav) {
+    const secs = [
+      ["#hero", "Home"], ["#about", "About"], ["#experience", "Experience"],
+      ["#projects", "Projects"], ["#skills", "Skills"], ["#contact", "Contact"],
+    ];
+    secs.forEach(([href, label]) => {
+      const a = el("a", "dot", `<span class="dot-label">${label}</span>`);
+      a.href = href; a.setAttribute("aria-label", label); a.dataset.for = href;
+      dotsNav.appendChild(a);
+    });
+    const dots = $$(".dot", dotsNav);
+    const dio = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (en.isIntersecting) {
+          const id = "#" + en.target.id;
+          dots.forEach((d) => d.classList.toggle("on", d.dataset.for === id));
+        }
+      });
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    sections.forEach((s) => dio.observe(s));
+  }
+
   const counters = $$("[data-count]");
   const cio = new IntersectionObserver((entries) => {
     entries.forEach((en) => {

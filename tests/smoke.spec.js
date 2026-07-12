@@ -144,6 +144,24 @@ test.describe("portfolio", () => {
     await expect(page.locator("#contact-email")).toHaveText("wasi.hussain914@gmail.com");
   });
 
+  test("section navigator dots render and track scroll", async ({ page }) => {
+    await page.goto("/");
+    const dots = page.locator(".dots-nav .dot");
+    await expect(dots).toHaveCount(6);
+    // scrolling to projects marks the projects dot active
+    await page.locator("#projects").scrollIntoViewIfNeeded();
+    await page.waitForTimeout(500);
+    await expect(page.locator('.dots-nav .dot[data-for="#projects"]')).toHaveClass(/on/);
+  });
+
+  test("PWA manifest is served and valid", async ({ page }) => {
+    const res = await page.request.get("/manifest.webmanifest");
+    expect(res.status()).toBe(200);
+    const m = await res.json();
+    expect(m.name).toMatch(/Wasi Hussain/);
+    expect(Array.isArray(m.icons)).toBe(true);
+  });
+
   test("resume pdf is reachable", async ({ page }) => {
     const res = await page.request.get("/assets/resume.pdf");
     expect(res.status()).toBe(200);
