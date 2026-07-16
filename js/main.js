@@ -6,6 +6,7 @@
 import {
   profile, stats, education, experience, categories, projects, skills, skillCloud,
 } from "./data.js";
+import { buildPreview } from "./preview.js";
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -122,6 +123,7 @@ function renderProjects() {
     card.setAttribute("aria-label", `${p.name} — view details`);
     card.innerHTML = `
       <div class="p-glow"></div>
+      <div class="p-body">
       ${p.award ? `<span class="p-award">${p.award}</span>` : ""}
       <div class="p-head">
         <span class="p-name">${p.name}</span>
@@ -133,7 +135,12 @@ function renderProjects() {
       <div class="p-foot">
         <div class="p-stack">${p.stack.map((s) => `<span>${s}</span>`).join("")}</div>
         <span class="p-link">Details →</span>
+      </div>
       </div>`;
+    // Preview media strip (real video/image if provided, else themed canvas).
+    const preview = buildPreview(p);
+    card.insertBefore(preview, card.querySelector(".p-body"));
+    if (preview._bind) preview._bind(card);
     attachTilt(card);
     const open = () => openProject(idx);
     card.addEventListener("click", open);

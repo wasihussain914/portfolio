@@ -210,6 +210,23 @@ main { position: relative; z-index: 1; }
 .p-link:hover { gap: 9px; }
 .p-card.hide { display: none; }
 
+/* ---- Project preview strip (hover video/image or themed canvas) ---------- */
+.p-preview { position: relative; height: 150px; margin: -26px -24px 18px; overflow: hidden;
+  background: #06070c; border-bottom: 1px solid var(--border); }
+.p-preview.has-canvas {
+  background:
+    radial-gradient(120% 100% at 50% 0%, color-mix(in srgb, var(--card-accent, var(--accent)) 14%, transparent), transparent 70%),
+    #06070c; }
+.p-preview-media { display: block; width: 100%; height: 100%; object-fit: cover;
+  opacity: .82; transition: opacity .45s ease, transform .6s ease; }
+.p-card:hover .p-preview-media { opacity: 1; transform: scale(1.03); }
+/* Blend the strip into the card body */
+.p-preview::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to bottom, transparent 60%, var(--surface)); opacity: .9; }
+.p-preview.has-media::after { background: linear-gradient(to bottom, transparent 72%, var(--surface)); }
+.p-body { position: relative; }
+@media (max-width: 640px) { .p-preview { height: 128px; } }
+
 /* ---------- Skills ---------- */
 .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 46px; align-items: center; }
 .skills-sphere-wrap { position: relative; aspect-ratio: 1; max-height: 460px; }
