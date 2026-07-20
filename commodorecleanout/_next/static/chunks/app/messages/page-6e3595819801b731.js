@@ -3,4 +3,4 @@
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
- */let a=(0,s(1066).Z)("MessageCircle",[["path",{d:"M7.9 20A9 9 0 1 0 4 16.1L2 22Z",key:"vv11sd"}]])}},function(e){e.O(0,[231,557,158,484,971,23,744],function(){return e(e.s=2892)}),_N_E=e.O()}]);
+ */let a=(0,s(1066).Z)("MessageCircle",[["path",{d:"M7.9 20A9 9 0 1 0 4 16.1L2 22Z",key:"vv11sd"}]])}},function(e){e.O(0,[231,557,836,484,971,23,744],function(){return e(e.s=2892)}),_N_E=e.O()}]);
