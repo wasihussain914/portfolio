@@ -2,40 +2,40 @@
   "name": "CommodoreCleanout",
   "short_name": "Cleanout",
   "description": "Buy, sell, and trade goods with fellow Vanderbilt students.",
-  "id": "/commodorecleanout/",
-  "start_url": "/commodorecleanout/",
-  "scope": "/commodorecleanout/",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
   "theme_color": "#CFAE70",
   "background_color": "#F7F1E3",
   "icons": [
     {
-      "src": "/commodorecleanout/icons/icon-192.png",
+      "src": "./icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/commodorecleanout/icons/icon-512.png",
+      "src": "./icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/commodorecleanout/icons/icon-maskable-192.png",
+      "src": "./icons/icon-maskable-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/commodorecleanout/icons/icon-maskable-512.png",
+      "src": "./icons/icon-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/commodorecleanout/icon.svg",
+      "src": "./icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"

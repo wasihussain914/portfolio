@@ -1,7 +1,9 @@
 /* CommodoreCleanout service worker.
  *
- * Served from /commodorecleanout/sw.js (static export under a basePath), so
- * its scope is the whole app. Registered by components/PwaProvider.tsx.
+ * Served from <basePath>/sw.js (static export; basePath is '' on the
+ * root-domain deploy commodorecleanout.com and '/commodorecleanout' on the
+ * legacy subpath deploy), so its scope is the whole app. Registered by
+ * components/PwaProvider.tsx.
  *
  * Responsibilities:
  *   1. Offline shell — precache the app shell + icons; navigations are
@@ -12,8 +14,10 @@
  *      focuses an open tab or opens the target URL.
  */
 
-// Keep in sync with BASE_PATH in lib/constants.ts (plain JS file — no imports).
-const BASE_PATH = '/commodorecleanout';
+// Derived from the worker's own URL (it always lives at <basePath>/sw.js), so
+// the same file works for both the root-domain and subpath deploys. '' at the
+// domain root, '/commodorecleanout' on the legacy subpath deploy.
+const BASE_PATH = self.location.pathname.replace(/\/sw\.js$/, '');
 // Bump to invalidate old caches on deploy.
 const CACHE_NAME = 'cc-shell-v1';
 
