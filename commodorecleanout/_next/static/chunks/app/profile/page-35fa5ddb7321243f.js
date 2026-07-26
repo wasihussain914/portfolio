@@ -18,4 +18,4 @@
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
- */let a=(0,s(1066).Z)("Mail",[["rect",{width:"20",height:"16",x:"2",y:"4",rx:"2",key:"18n3k1"}],["path",{d:"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7",key:"1ocrg3"}]])}},function(e){e.O(0,[231,259,914,416,517,971,23,744],function(){return e(e.s=9716)}),_N_E=e.O()}]);
+ */let a=(0,s(1066).Z)("Mail",[["rect",{width:"20",height:"16",x:"2",y:"4",rx:"2",key:"18n3k1"}],["path",{d:"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7",key:"1ocrg3"}]])}},function(e){e.O(0,[231,259,914,484,189,971,23,744],function(){return e(e.s=9716)}),_N_E=e.O()}]);
