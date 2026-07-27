@@ -1,4 +1,4 @@
-(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[138],{7904:function(e,t,a){Promise.resolve().then(a.bind(a,2951))},2951:function(e,t,a){"use strict";a.r(t),a.d(t,{default:function(){return k}});var n=a(7437),r=a(2265),s=a(4153),l=a(914),i=a(5447),o=a(5862),c=a(3787);/**
+(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[138],{7904:function(e,t,a){Promise.resolve().then(a.bind(a,2951))},2951:function(e,t,a){"use strict";a.r(t),a.d(t,{default:function(){return k}});var n=a(7437),r=a(2265),s=a(4153),l=a(9562),i=a(5447),o=a(5862),c=a(3787);/**
  * @license lucide-react v0.344.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -28,4 +28,4 @@
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
- */let n=(0,a(1066).Z)("Recycle",[["path",{d:"M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5",key:"x6z5xu"}],["path",{d:"M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12",key:"1x4zh5"}],["path",{d:"m14 16-3 3 3 3",key:"f6jyew"}],["path",{d:"M8.293 13.596 7.196 9.5 3.1 10.598",key:"wf1obh"}],["path",{d:"m9.344 5.811 1.093-1.892A1.83 1.83 0 0 1 11.985 3a1.784 1.784 0 0 1 1.546.888l3.943 6.843",key:"9tzpgr"}],["path",{d:"m13.378 9.633 4.096 1.098 1.097-4.096",key:"1oe83g"}]])}},function(e){e.O(0,[231,145,914,484,971,23,744],function(){return e(e.s=7904)}),_N_E=e.O()}]);
+ */let n=(0,a(1066).Z)("Recycle",[["path",{d:"M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5",key:"x6z5xu"}],["path",{d:"M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12",key:"1x4zh5"}],["path",{d:"m14 16-3 3 3 3",key:"f6jyew"}],["path",{d:"M8.293 13.596 7.196 9.5 3.1 10.598",key:"wf1obh"}],["path",{d:"m9.344 5.811 1.093-1.892A1.83 1.83 0 0 1 11.985 3a1.784 1.784 0 0 1 1.546.888l3.943 6.843",key:"9tzpgr"}],["path",{d:"m13.378 9.633 4.096 1.098 1.097-4.096",key:"1oe83g"}]])}},function(e){e.O(0,[231,460,562,484,971,23,744],function(){return e(e.s=7904)}),_N_E=e.O()}]);
