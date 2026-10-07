@@ -32,14 +32,10 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>🪓 Dance Looper</h1>
-  <p class="sub">Load a track, click the waveform to set loop start/end, drill it on repeat. Slow it down without the chipmunk pitch.</p>
+  <h1>🪓 Dance Looper · Local Bus</h1>
+  <p class="sub">Click the waveform to set loop start/end, drill it on repeat. Slow it down without the chipmunk pitch.</p>
 
-  <label class="drop" id="drop">
-    <input type="file" id="file" accept="audio/*,video/*">
-    <div id="dropText">Drop an audio/video file here, or click to pick one</div>
-  </label>
-  <div style="margin-top:10px"><button id="loadBundled">▸ Load “Local Bus — Momtaz”</button></div>
+  <div class="drop" id="drop"><div id="dropText">Loading Local Bus — Momtaz …</div></div>
 
   <canvas id="wave" width="1200" height="300"></canvas>
   <div class="time"><span id="tCur">0:00.0</span><span id="tLoop"></span><span id="tDur">0:00.0</span></div>
@@ -89,18 +85,14 @@ async function decodeInto(buf, name){
   $('tDur').textContent = fmt(buffer.duration);
   drawWave(); updatePlayhead();
 }
-async function loadFile(f){
-  $('dropText').textContent = 'Decoding '+f.name+' …';
-  await decodeInto(await f.arrayBuffer(), f.name);
-}
 async function loadURL(url, name){
   $('dropText').textContent = 'Loading '+name+' …';
   const r = await fetch(url);
   await decodeInto(await r.arrayBuffer(), name);
 }
-$('loadBundled').onclick=()=> loadURL('local-bus-momtaz.mp3','Local Bus — Momtaz');
-// auto-load the bundled track on first visit
-window.addEventListener('load',()=>loadURL('local-bus-momtaz.mp3','Local Bus — Momtaz').catch(()=>{}));
+// locked to the Local Bus track
+window.addEventListener('load',()=>loadURL('local-bus-momtaz.mp3','Local Bus — Momtaz')
+  .catch(()=>{$('dropText').textContent='Could not load track — refresh to retry.';}));
 
 function drawWave(){
   const W=wave.width, H=wave.height; g.clearRect(0,0,W,H);
@@ -208,13 +200,6 @@ wave.addEventListener('pointermove',e=>{
 });
 window.addEventListener('pointerup',()=>dragMark=null);
 wave.addEventListener('dblclick',e=>{ const r=wave.getBoundingClientRect(); seek((e.clientX-r.left)/r.width*buffer.duration); });
-
-// drag-drop
-const drop=$('drop');
-['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('hover');}));
-['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('hover');}));
-drop.addEventListener('drop',e=>{ const f=e.dataTransfer.files[0]; if(f)loadFile(f); });
-$('file').onchange=e=>{ const f=e.target.files[0]; if(f)loadFile(f); };
 
 // keys
 window.addEventListener('keydown',e=>{
