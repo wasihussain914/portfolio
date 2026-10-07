@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dance Looper</title>
+<style>
+  :root { --bg:#0e0f13; --panel:#191b22; --fg:#e8eaf0; --mut:#8b90a0; --acc:#ff4d6d; --acc2:#4da3ff; --loop:rgba(255,77,109,.18); }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/1.4 -apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--fg); }
+  .wrap { max-width:960px; margin:0 auto; padding:24px 18px 60px; }
+  h1 { font-size:20px; margin:0 0 4px; }
+  .sub { color:var(--mut); margin:0 0 20px; font-size:13px; }
+  .drop { border:2px dashed #333; border-radius:14px; padding:34px; text-align:center; color:var(--mut); cursor:pointer; transition:.15s; }
+  .drop.hover { border-color:var(--acc); color:var(--fg); background:#15161c; }
+  .drop input { display:none; }
+  canvas { width:100%; height:150px; display:block; background:var(--panel); border-radius:12px; margin:18px 0 6px; cursor:crosshair; touch-action:none; }
+  .time { display:flex; justify-content:space-between; color:var(--mut); font-size:12px; font-variant-numeric:tabular-nums; }
+  .controls { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:16px; }
+  button { background:var(--panel); color:var(--fg); border:1px solid #2a2d38; border-radius:10px; padding:10px 14px; font-size:14px; cursor:pointer; }
+  button:hover { border-color:var(--acc2); }
+  button.primary { background:var(--acc); border-color:var(--acc); color:#fff; font-weight:600; }
+  button.on { background:var(--acc2); border-color:var(--acc2); color:#fff; }
+  .seg { display:flex; align-items:center; gap:8px; }
+  .seg label { color:var(--mut); font-size:12px; min-width:46px; }
+  input[type=range] { width:160px; accent-color:var(--acc); }
+  .val { font-variant-numeric:tabular-nums; min-width:46px; color:var(--fg); font-size:13px; }
+  .hint { color:var(--mut); font-size:12px; margin-top:22px; line-height:1.7; }
+  kbd { background:#23252e; border:1px solid #333; border-radius:5px; padding:1px 6px; font-size:11px; }
+  .loopbtns button { padding:8px 11px; font-size:13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🪓 Dance Looper</h1>
+  <p class="sub">Load a track, click the waveform to set loop start/end, drill it on repeat. Slow it down without the chipmunk pitch.</p>
+
+  <label class="drop" id="drop">
+    <input type="file" id="file" accept="audio/*,video/*">
+    <div id="dropText">Drop an audio/video file here, or click to pick one</div>
+  </label>
+  <div style="margin-top:10px"><button id="loadBundled">▸ Load “Local Bus — Momtaz”</button></div>
+
+  <canvas id="wave" width="1200" height="300"></canvas>
+  <div class="time"><span id="tCur">0:00.0</span><span id="tLoop"></span><span id="tDur">0:00.0</span></div>
+
+  <div class="controls">
+    <button id="play" class="primary">▶ Play</button>
+    <div class="loopbtns seg">
+      <button id="setA">Set A ⟮</button>
+      <button id="setB">Set B ⟯</button>
+      <button id="loopToggle" class="on">Loop: ON</button>
+      <button id="clear">Clear loop</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="seg"><label>Speed</label><input type="range" id="speed" min="0.3" max="1.2" step="0.05" value="1"><span class="val" id="speedV">1.00×</span></div>
+    <div class="seg"><label>Volume</label><input type="range" id="vol" min="0" max="1" step="0.02" value="1"><span class="val" id="volV">100%</span></div>
+    <button id="back5">⟲ 5s</button>
+    <button id="pitchToggle" class="on">Keep pitch: ON</button>
+  </div>
+
+  <div class="hint">
+    <b>Shortcuts:</b>
+    <kbd>Space</kbd> play/pause ·
+    <kbd>A</kbd> set loop start ·
+    <kbd>B</kbd> set loop end ·
+    <kbd>L</kbd> toggle loop ·
+    <kbd>←</kbd>/<kbd>→</kbd> nudge 2s ·
+    <kbd>↑</kbd>/<kbd>↓</kbd> speed<br>
+    Tip: click once on the waveform to set A, click again (to the right) to set B. Click a set marker and drag to fine-tune. Everything runs locally in your browser — nothing uploads.
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let ctx, buffer, src, gain, startedAt=0, offset=0, playing=false, raf;
+let loopA=null, loopB=null, loop=true, speed=1, keepPitch=true, vol=1;
+const wave=$('wave'), g=wave.getContext('2d');
+
+function fmt(t){ if(t==null||isNaN(t))return '--'; const m=Math.floor(t/60), s=(t%60); return m+':'+s.toFixed(1).padStart(4,'0'); }
+
+async function decodeInto(buf, name){
+  ctx = ctx || new (window.AudioContext||window.webkitAudioContext)();
+  buffer = await ctx.decodeAudioData(buf);
+  offset=0; loopA=null; loopB=null;
+  $('dropText').textContent = name + '  ·  '+fmt(buffer.duration);
+  $('tDur').textContent = fmt(buffer.duration);
+  drawWave(); updatePlayhead();
+}
+async function loadFile(f){
+  $('dropText').textContent = 'Decoding '+f.name+' …';
+  await decodeInto(await f.arrayBuffer(), f.name);
+}
+async function loadURL(url, name){
+  $('dropText').textContent = 'Loading '+name+' …';
+  const r = await fetch(url);
+  await decodeInto(await r.arrayBuffer(), name);
+}
+$('loadBundled').onclick=()=> loadURL('local-bus-momtaz.mp3','Local Bus — Momtaz');
+// auto-load the bundled track on first visit
+window.addEventListener('load',()=>loadURL('local-bus-momtaz.mp3','Local Bus — Momtaz').catch(()=>{}));
+
+function drawWave(){
+  const W=wave.width, H=wave.height; g.clearRect(0,0,W,H);
+  if(!buffer) return;
+  // loop region
+  if(loopA!=null&&loopB!=null){
+    const x1=loopA/buffer.duration*W, x2=loopB/buffer.duration*W;
+    g.fillStyle=getComputedStyle(document.body).getPropertyValue('--loop');
+    g.fillRect(x1,0,x2-x1,H);
+  }
+  const data=buffer.getChannelData(0), step=Math.ceil(data.length/W), amp=H/2;
+  g.strokeStyle='#4da3ff'; g.beginPath();
+  for(let i=0;i<W;i++){ let min=1,max=-1;
+    for(let j=0;j<step;j++){ const v=data[i*step+j]; if(v<min)min=v; if(v>max)max=v; }
+    g.moveTo(i,(1+min)*amp); g.lineTo(i,(1+max)*amp);
+  }
+  g.stroke();
+  // markers
+  function mark(t,c){ if(t==null)return; const x=t/buffer.duration*W; g.strokeStyle=c; g.lineWidth=2; g.beginPath(); g.moveTo(x,0); g.lineTo(x,H); g.stroke(); g.lineWidth=1; }
+  mark(loopA,'#ff4d6d'); mark(loopB,'#ff4d6d');
+}
+
+function curTime(){ if(!playing) return offset; return offset + (ctx.currentTime-startedAt)*speed; }
+
+function updatePlayhead(){
+  drawWave();
+  if(buffer){
+    const t=Math.min(curTime(),buffer.duration), x=t/buffer.duration*wave.width;
+    g.strokeStyle='#fff'; g.beginPath(); g.moveTo(x,0); g.lineTo(x,wave.height); g.stroke();
+    $('tCur').textContent=fmt(t);
+  }
+  $('tLoop').textContent = (loopA!=null&&loopB!=null)? 'loop '+fmt(loopA)+' – '+fmt(loopB) : (loopA!=null?'A '+fmt(loopA):'');
+  if(playing) raf=requestAnimationFrame(updatePlayhead);
+}
+
+function startSource(at){
+  src=ctx.createBufferSource(); src.buffer=buffer;
+  src.playbackRate.value=speed;
+  if('preservesPitch' in src) src.preservesPitch=keepPitch;
+  src.connect(gain);
+  startedAt=ctx.currentTime; offset=at;
+  src.start(0,at);
+  src.onended=()=>{ if(playing) checkLoop(true); };
+}
+
+function play(){
+  if(!buffer) return;
+  if(ctx.state==='suspended') ctx.resume();
+  gain = gain || ctx.createGain(); gain.gain.value=vol; gain.connect(ctx.destination);
+  playing=true; $('play').textContent='⏸ Pause';
+  startSource(offset); updatePlayhead();
+  tick();
+}
+function pause(){
+  if(!playing) return;
+  offset=curTime(); playing=false; $('play').textContent='▶ Play';
+  try{src.stop();}catch(e){} cancelAnimationFrame(raf);
+}
+function stopSrc(){ try{src.onended=null; src.stop();}catch(e){} }
+
+// loop checking on a timer (buffer source can't loop arbitrary region w/ rate changes cleanly)
+let tickT;
+function tick(){
+  clearTimeout(tickT);
+  if(!playing) return;
+  if(loop && loopA!=null && loopB!=null && curTime()>=loopB){
+    stopSrc(); startSource(loopA);
+  } else if(curTime()>=buffer.duration){
+    if(loop && loopA!=null && loopB!=null){ stopSrc(); startSource(loopA); }
+    else { pause(); offset=0; }
+  }
+  tickT=setTimeout(tick,30);
+}
+function checkLoop(ended){ if(ended && playing){ tick(); } }
+
+$('play').onclick=()=> playing?pause():play();
+$('setA').onclick=()=>{ loopA=curTime(); if(loopB!=null&&loopB<=loopA)loopB=null; drawWave(); updatePlayhead(); };
+$('setB').onclick=()=>{ loopB=curTime(); if(loopA==null)loopA=0; drawWave(); updatePlayhead(); };
+$('clear').onclick=()=>{ loopA=loopB=null; drawWave(); updatePlayhead(); };
+$('loopToggle').onclick=e=>{ loop=!loop; e.target.textContent='Loop: '+(loop?'ON':'OFF'); e.target.classList.toggle('on',loop); };
+$('back5').onclick=()=>{ seek(Math.max(0,curTime()-5)); };
+$('pitchToggle').onclick=e=>{ keepPitch=!keepPitch; if(src&&'preservesPitch'in src)src.preservesPitch=keepPitch; e.target.textContent='Keep pitch: '+(keepPitch?'ON':'OFF'); e.target.classList.toggle('on',keepPitch); };
+
+$('speed').oninput=e=>{ speed=+e.target.value; $('speedV').textContent=speed.toFixed(2)+'×'; if(playing){offset=curTime(); stopSrc(); startSource(offset);} };
+$('vol').oninput=e=>{ vol=+e.target.value; $('volV').textContent=Math.round(vol*100)+'%'; if(gain)gain.gain.value=vol; };
+
+function seek(t){ offset=Math.max(0,Math.min(t,buffer.duration)); if(playing){stopSrc(); startSource(offset);} updatePlayhead(); }
+
+// waveform click/drag
+let dragMark=null;
+wave.addEventListener('pointerdown',e=>{
+  if(!buffer)return;
+  const r=wave.getBoundingClientRect(); const t=(e.clientX-r.left)/r.width*buffer.duration;
+  const px=t/buffer.duration*wave.width;
+  const near=(m)=> m!=null && Math.abs(m/buffer.duration*wave.width-px)<8;
+  if(near(loopA)){dragMark='A';} else if(near(loopB)){dragMark='B';}
+  else { if(loopA==null||loopB!=null){loopA=t;loopB=null;} else if(t>loopA){loopB=t;} else {loopB=loopA;loopA=t;} }
+  drawWave(); updatePlayhead();
+});
+wave.addEventListener('pointermove',e=>{
+  if(!dragMark||!buffer)return;
+  const r=wave.getBoundingClientRect(); const t=(e.clientX-r.left)/r.width*buffer.duration;
+  if(dragMark==='A')loopA=Math.min(t,loopB??buffer.duration); else loopB=Math.max(t,loopA??0);
+  drawWave(); updatePlayhead();
+});
+window.addEventListener('pointerup',()=>dragMark=null);
+wave.addEventListener('dblclick',e=>{ const r=wave.getBoundingClientRect(); seek((e.clientX-r.left)/r.width*buffer.duration); });
+
+// drag-drop
+const drop=$('drop');
+['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('hover');}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('hover');}));
+drop.addEventListener('drop',e=>{ const f=e.dataTransfer.files[0]; if(f)loadFile(f); });
+$('file').onchange=e=>{ const f=e.target.files[0]; if(f)loadFile(f); };
+
+// keys
+window.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT')return;
+  const k=e.key.toLowerCase();
+  if(e.code==='Space'){e.preventDefault();playing?pause():play();}
+  else if(k==='a'){loopA=curTime(); if(loopB!=null&&loopB<=loopA)loopB=null; drawWave();updatePlayhead();}
+  else if(k==='b'){loopB=curTime(); if(loopA==null)loopA=0; drawWave();updatePlayhead();}
+  else if(k==='l'){loop=!loop; const b=$('loopToggle'); b.textContent='Loop: '+(loop?'ON':'OFF'); b.classList.toggle('on',loop);}
+  else if(e.key==='ArrowRight')seek(curTime()+2);
+  else if(e.key==='ArrowLeft')seek(curTime()-2);
+  else if(e.key==='ArrowUp'){speed=Math.min(1.2,speed+0.05);$('speed').value=speed;$('speedV').textContent=speed.toFixed(2)+'×';if(playing){offset=curTime();stopSrc();startSource(offset);}}
+  else if(e.key==='ArrowDown'){speed=Math.max(0.3,speed-0.05);$('speed').value=speed;$('speedV').textContent=speed.toFixed(2)+'×';if(playing){offset=curTime();stopSrc();startSource(offset);}}
+});
+</script>
+</body>
+</html>
