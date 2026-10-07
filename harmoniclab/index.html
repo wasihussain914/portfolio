@@ -1185,7 +1185,14 @@
         ctx.clearRect(0, 0, w, h);
         var mid = h * 0.5;
         var A = h * 0.4;
-        var c = 0.32 + 0.4 * (0.5 - 0.5 * Math.cos(t * 0.11)); // characteristic place drifts = frequency sweep
+        // Greenwood frequency-place map (human): position p runs apex(0) -> base(1),
+        // CF(p) = 165.4 * (10^(2.1 p) - 0.88) Hz. Canvas x runs base(0) -> apex(1), so p = 1 - x.
+        // Sweep the stimulus frequency log-smoothly and place its peak at the real characteristic place.
+        var FMIN = 300, FMAX = 12000;
+        var u = 0.5 - 0.5 * Math.cos(t * 0.26);
+        var fHz = FMIN * Math.pow(FMAX / FMIN, u);
+        var pApex = Math.log(fHz / 165.4 + 0.88) / Math.LN10 / 2.1;
+        var c = 1 - Math.max(0, Math.min(1, pApex)); // characteristic place for the current frequency
         var omega = 1.5;
         var step = w < 700 ? 2 : 3;
         var fs = Math.max(0.55, Math.min(1, w / 1200)); // fewer cycles on narrow screens
@@ -1217,9 +1224,15 @@
           var amp = A * (1 - 0.6 * dist);
           var off = (i - m) * 0.3;
           ctx.beginPath();
+          var acc = 0, prevX = 0;
           for (var px = 0; px <= w + step; px += step) {
             var x = Math.min(1, px / w);
-            var phase = 2 * Math.PI * fs * (2.4 * x + 8.5 * x * x) - omega * t - off;
+            // Local wavenumber grows toward the characteristic place, so the wavelength
+            // compresses as the wave slows near CF - the signature of a BM traveling wave.
+            var kd = (x - c) / 0.20;
+            var kloc = 2.2 + 9 * Math.exp(-kd * kd);
+            acc += 2 * Math.PI * fs * kloc * (x - prevX); prevX = x;
+            var phase = acc - omega * t - off;
             var y = mid - amp * (0.04 + 0.96 * envelope(x, c)) * edge(x) * Math.sin(phase);
             if (px === 0) ctx.moveTo(px, y); else ctx.lineTo(px, y);
           }
@@ -1244,6 +1257,14 @@
         ctx.beginPath(); ctx.arc(cx, mid, 3, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = 'rgba(217,119,6,0.16)';
         ctx.beginPath(); ctx.arc(cx, mid, 8, 0, Math.PI * 2); ctx.fill();
+
+        // Live frequency readout at the characteristic place (Greenwood CF)
+        ctx.font = '600 11px "IBM Plex Mono", monospace';
+        ctx.fillStyle = 'rgba(180,83,9,0.92)';
+        ctx.textAlign = cx > w - 72 ? 'right' : 'left';
+        var fLabel = fHz >= 1000 ? (fHz / 1000).toFixed(1) + ' kHz' : Math.round(fHz) + ' Hz';
+        ctx.fillText(fLabel, cx + (ctx.textAlign === 'right' ? -7 : 7), h * 0.04 + 9);
+        ctx.textAlign = 'left';
       }
 
       function frame(now) {
