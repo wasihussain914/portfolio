@@ -289,6 +289,16 @@
     .pipe-step h4 { color: #fff; font-weight: 500; font-size: 16px; line-height: 1.35; }
     .pipe-step p { font-size: 14.5px; line-height: 1.55; margin-top: 2px; }
 
+
+    /* Photos */
+    .photo-wrap { overflow: hidden; padding: 0; }
+    .photo-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+    .bio-fig { border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,.14); background: #0B2B28; margin: 0; }
+    .bio-fig img { width: 100%; height: 280px; object-fit: cover; display: block; }
+    .bio-fig figcaption { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: #9FB7B3; padding: 10px 14px; }
+    .area-fig { border-radius: 14px; overflow: hidden; border: 1px solid var(--line); margin: 28px 0 0; }
+    .area-fig img { width: 100%; height: 200px; object-fit: cover; display: block; }
+    .area-fig figcaption { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #6B7280; padding: 9px 12px; background: var(--paper-2); }
     /* Team */
     .mono-avatar {
       flex: none; display: grid; place-items: center; border-radius: 50%;
@@ -593,8 +603,11 @@
               The macrophage response to acoustic trauma is well documented, but in other systems macrophages are only one part of the immune response to tissue damage.
               Examining the immune compartment of the inner ear, we found type II innate immune cells to be among the dominant cell types besides macrophages, a pathway that aids wound healing and regeneration but can also drive fibrosis, and one that remains understudied in the ear.
             </p>
-            <div class="h-8" aria-hidden="true"></div>
-            <div class="mt-auto flex flex-wrap gap-2">
+            <figure class="area-fig">
+              <img src="assets/confocal-il33.jpg" alt="Confocal micrograph of the cochlear apex labeled for CD45, IL33, TCR gamma-delta and DAPI" loading="lazy" />
+              <figcaption>Cochlear apex · CD45 · IL33 · TCRγδ · DAPI</figcaption>
+            </figure>
+            <div class="mt-auto flex flex-wrap gap-2 pt-7">
               <span class="tag">Macrophages</span>
               <span class="tag">Type II innate cells</span>
               <span class="tag">Wound healing</span>
@@ -649,6 +662,17 @@
               </ol>
             </div>
           </div>
+
+          <div class="relative grid sm:grid-cols-2 gap-4 px-7 sm:px-10 lg:px-16 pb-7 sm:pb-10 lg:pb-16 -mt-2">
+            <figure class="bio-fig" data-reveal>
+              <img src="assets/biomap-labeled-mouse.jpg" alt="Video frame of a mouse with thirteen numbered machine-learning keypoints tracked across its nose, whiskers, eye, ear and body" loading="lazy" />
+              <figcaption>BIOMAP · keypoint tracking of grimace &amp; movement</figcaption>
+            </figure>
+            <figure class="bio-fig" data-reveal>
+              <img src="assets/confocal-32khz.jpg" alt="Confocal micrograph of the cochlea at the 32 kHz region, labeled for CGRP, CD45, ChAT and DAPI" loading="lazy" />
+              <figcaption>Cochlea · 32 kHz region · CGRP · CD45 · ChAT · DAPI</figcaption>
+            </figure>
+          </div>
         </article>
       </div>
     </section>
@@ -669,7 +693,7 @@
         <!-- PI -->
         <article class="pi-card mt-14 md:mt-16 grid lg:grid-cols-12" aria-labelledby="pi-name" data-reveal>
           <div class="pi-side lg:col-span-4 border-b lg:border-b-0 lg:border-r p-8 sm:p-10 lg:p-12 flex flex-col sm:flex-row lg:flex-col gap-7 items-start sm:items-center lg:items-start">
-            <div class="mono-avatar pi-avatar" role="img" aria-label="Monogram for Megan Beers Wood">MBW</div>
+            <div class="mono-avatar pi-avatar photo-wrap"><img src="assets/pi-megan-beers-wood.jpg" alt="Portrait of Megan Beers Wood, Ph.D." /></div>
             <div class="lg:mt-6">
               <p class="label">Principal Investigator</p>
               <p class="mt-2 text-[15px] text-muted leading-snug">Dept. of Hearing and Speech Sciences<br />Vanderbilt University Medical Center</p>
@@ -697,7 +721,7 @@
         <ul class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5" role="list">
           <li data-reveal>
             <div class="member">
-              <div class="mono-avatar av-1" role="img" aria-label="Monogram for Amy Conner">AC</div>
+              <div class="mono-avatar av-1 photo-wrap"><img src="assets/amy-conner.jpg" alt="Portrait of Amy Conner, AuD, PhD" loading="lazy" /></div>
               <div>
                 <p class="member-name">Amy Conner, AuD, PhD</p>
                 <p class="label mt-2">Postdoctoral Research Fellow</p>
@@ -706,7 +730,7 @@
           </li>
           <li data-reveal>
             <div class="member">
-              <div class="mono-avatar av-2" role="img" aria-label="Monogram for Frances Collins">FC</div>
+              <div class="mono-avatar av-2 photo-wrap"><img src="assets/frances-collins.jpg" alt="Portrait of Frances Collins" loading="lazy" /></div>
               <div>
                 <p class="member-name">Frances Collins</p>
                 <p class="label mt-2">Graduate Research Assistant</p>
@@ -715,7 +739,7 @@
           </li>
           <li data-reveal>
             <div class="member">
-              <div class="mono-avatar av-3" role="img" aria-label="Monogram for Megan Guidry">MG</div>
+              <div class="mono-avatar av-3 photo-wrap"><img src="assets/megan-guidry.jpg" alt="Portrait of Megan Guidry" loading="lazy" /></div>
               <div>
                 <p class="member-name">Megan Guidry</p>
                 <p class="label mt-2">Graduate Research Assistant</p>
@@ -724,7 +748,7 @@
           </li>
           <li data-reveal>
             <div class="member">
-              <div class="mono-avatar av-4" role="img" aria-label="Monogram for Lucy Wu">LW</div>
+              <div class="mono-avatar av-4 photo-wrap"><img src="assets/lucy-wu.jpg" alt="Portrait of Lucy Wu" loading="lazy" /></div>
               <div>
                 <p class="member-name">Lucy Wu</p>
                 <p class="label mt-2">Undergraduate Research Assistant</p>
@@ -736,7 +760,7 @@
         <div class="mt-10 pt-6 border-t border-line flex flex-wrap items-center gap-x-6 gap-y-3" data-reveal>
           <h3 class="label">Former lab members</h3>
           <div class="flex items-center gap-3">
-            <div class="mono-avatar av-5" style="width:36px;height:36px;font-size:13px" role="img" aria-label="Monogram for Emily Thompson">ET</div>
+            <div class="mono-avatar av-5 photo-wrap" style="width:36px;height:36px"><img src="assets/emily-thompson.jpg" alt="Portrait of Emily Thompson, AuD, PhD" loading="lazy" /></div>
             <p class="text-[15px]"><span class="font-medium">Emily Thompson, AuD, PhD</span></p>
           </div>
         </div>
