@@ -24,6 +24,7 @@
   .seg { display:flex; align-items:center; gap:8px; }
   .seg label { color:var(--mut); font-size:12px; min-width:46px; }
   input[type=range] { width:160px; accent-color:var(--acc); }
+  .seekbar { width:100%; margin:2px 0 4px; accent-color:var(--acc2); cursor:pointer; }
   .val { font-variant-numeric:tabular-nums; min-width:46px; color:var(--fg); font-size:13px; }
   .hint { color:var(--mut); font-size:12px; margin-top:22px; line-height:1.7; }
   kbd { background:#23252e; border:1px solid #333; border-radius:5px; padding:1px 6px; font-size:11px; }
@@ -38,6 +39,7 @@
   <div class="drop" id="drop"><div id="dropText">Loading Local Bus — Momtaz …</div></div>
 
   <canvas id="wave" width="1200" height="300"></canvas>
+  <input type="range" id="seek" class="seekbar" min="0" max="1000" step="1" value="0">
   <div class="time"><span id="tCur">0:00.0</span><span id="tLoop"></span><span id="tDur">0:00.0</span></div>
 
   <div class="controls">
@@ -123,6 +125,7 @@ function updatePlayhead(){
     const t=Math.min(curTime(),buffer.duration), x=t/buffer.duration*wave.width;
     g.strokeStyle='#fff'; g.beginPath(); g.moveTo(x,0); g.lineTo(x,wave.height); g.stroke();
     $('tCur').textContent=fmt(t);
+    if(!seeking) $('seek').value = Math.round(t/buffer.duration*1000);
   }
   $('tLoop').textContent = (loopA!=null&&loopB!=null)? 'loop '+fmt(loopA)+' – '+fmt(loopB) : (loopA!=null?'A '+fmt(loopA):'');
   if(playing) raf=requestAnimationFrame(updatePlayhead);
@@ -180,6 +183,11 @@ $('speed').oninput=e=>{ speed=+e.target.value; $('speedV').textContent=speed.toF
 $('vol').oninput=e=>{ vol=+e.target.value; $('volV').textContent=Math.round(vol*100)+'%'; if(gain)gain.gain.value=vol; };
 
 function seek(t){ offset=Math.max(0,Math.min(t,buffer.duration)); if(playing){stopSrc(); startSource(offset);} updatePlayhead(); }
+
+// seek bar
+let seeking=false;
+$('seek').addEventListener('input',e=>{ if(!buffer)return; seeking=true; const t=e.target.value/1000*buffer.duration; offset=t; $('tCur').textContent=fmt(t); drawWave(); });
+$('seek').addEventListener('change',e=>{ if(!buffer){seeking=false;return;} seek(e.target.value/1000*buffer.duration); seeking=false; });
 
 // waveform click/drag
 let dragMark=null;
