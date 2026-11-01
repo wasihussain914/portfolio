@@ -208,7 +208,7 @@ async function tick() {
     $("dead").textContent = d.total - d.alive;
     $("clock").textContent = d.time_left + "s";
     $("clock").classList.toggle("low", d.running && d.time_left <= 15);
-    $("clockfill").style.width = (d.time_left/90*100) + "%";
+    $("clockfill").style.width = (d.time_left/(d.round_secs||90)*100) + "%";
     $("modetag").textContent = d.mode ? MODES[d.mode] + (d.over ? " · OVER" : "") : "LOBBY";
 
     const medals = ["🥇","🥈","🥉"];

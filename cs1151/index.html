@@ -338,7 +338,7 @@ async function poll() {
       $("clock").classList.toggle("low", d.time_left<=15);
       const mr = myRate();
       $("myrate").textContent = mr;
-      const danger = mode!=="classic" && mr < d.required && (90-d.time_left) > 12;
+      const danger = mode!=="classic" && mr < d.required && ((d.round_secs||90)-d.time_left) > 8;
       $("myrate").classList.toggle("danger", danger);
       $("ratewarn").style.visibility = danger ? "visible" : "hidden";
     }
