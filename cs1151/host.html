@@ -133,8 +133,8 @@
     <h2>CLOCK IN</h2>
     <div id="qr"></div>
     <div class="joinurl">wasihussain.com/<span>cs1151</span></div>
-    <div class="bignum" id="req">20</div>
-    <span class="bigsub">REQUIRED PICKS / MIN</span>
+    <div class="bignum" id="req" title="Click to reveal/hide (for the debrief)" style="cursor:pointer">––</div>
+    <span class="bigsub" id="reqlabel">REQUIRED PICKS / MIN · CLASSIFIED</span>
     <div class="duo">
       <div class="alive"><b id="alive">0</b><span>EMPLOYED</span></div>
       <div class="dead"><b id="dead">0</b><span>TERMINATED</span></div>
@@ -165,7 +165,8 @@ const KEY = new URLSearchParams(location.search).get("key") || "";
 new QRCode(document.getElementById("qr"), {text:"https://wasihussain.com/cs1151/", width:160, height:160, correctLevel:QRCode.CorrectLevel.M});
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let lastFired = 0, lastReq = 20, layoffShown = false;
+let lastFired = 0, lastReq = 20, layoffShown = false, reqRevealed = false;
+$("req").onclick = () => { reqRevealed = !reqRevealed; };
 const MODES = {classic:"R1 · FIRST SHIFT", bombs:"R2 · PEAK SEASON 💣", visible:"R3 · GLASS WAREHOUSE"};
 const REASONS = {rate:"below benchmark · no supervisor input", injury:"third safety incident", restructuring:"position eliminated"};
 const clearFeed = () => { $("feed").innerHTML = '<div id="feedempty">No terminations yet. The system is patient.</div>'; lastFired = 0; };
@@ -198,8 +199,11 @@ async function tick() {
   try {
     const d = await (await fetch(API+"/state")).json();
     const req = Math.round(d.required);
-    if (req !== lastReq) { $("req").classList.add("bump"); setTimeout(()=>$("req").classList.remove("bump"), 260); lastReq = req; }
-    $("req").textContent = req;
+    const showReq = d.mode === "visible" || reqRevealed;
+    if (showReq && req !== lastReq) { $("req").classList.add("bump"); setTimeout(()=>$("req").classList.remove("bump"), 260); }
+    lastReq = req;
+    $("req").textContent = showReq ? req : "––";
+    $("reqlabel").textContent = showReq ? "REQUIRED PICKS / MIN" : "REQUIRED PICKS / MIN · CLASSIFIED";
     $("alive").textContent = d.alive;
     $("dead").textContent = d.total - d.alive;
     $("clock").textContent = d.time_left + "s";
