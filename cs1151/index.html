@@ -326,6 +326,7 @@ async function poll() {
       terminateScreen(d.reason || "rate");
     } else if (started && !d.running && d.over && !over) {
       over = true;
+      started = false;   // re-arm so the next round start pulls this player back in
       if (!dead) {
         $("spicks").textContent = picks; show("survive");
         if (window.confetti) confetti({particleCount:120, spread:75, origin:{y:.65}, colors:["#ff9900","#ffb84d","#eaeded"]});
