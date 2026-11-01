@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="robots" content="noindex">
+<title>Fulfillment Associate Portal</title>
+<style>
+  :root { --navy:#232f3e; --navy2:#37475a; --orange:#ff9900; --light:#eaeded; --red:#d13212; --green:#1d8102; }
+  * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  body { font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif; background:var(--navy); color:var(--light); height:100dvh; overflow:hidden; touch-action:manipulation; }
+  .screen { display:none; height:100dvh; flex-direction:column; align-items:center; justify-content:center; padding:24px; text-align:center; }
+  .screen.on { display:flex; }
+  h1 { font-size:1.5rem; margin-bottom:6px; }
+  .sub { color:#95a5b8; font-size:.95rem; margin-bottom:22px; max-width:420px; }
+  input { width:100%; max-width:320px; padding:14px; font-size:1.1rem; border-radius:8px; border:2px solid var(--navy2); background:#1b2532; color:var(--light); text-align:center; margin-bottom:14px; }
+  button { background:var(--orange); color:var(--navy); border:0; border-radius:999px; padding:14px 34px; font-size:1.05rem; font-weight:700; cursor:pointer; }
+  .badge { background:var(--navy2); border-left:4px solid var(--orange); padding:10px 16px; border-radius:6px; margin-top:18px; font-size:.9rem; color:#c7d0da; }
+  /* game */
+  #hud { position:fixed; top:0; left:0; right:0; display:flex; justify-content:space-between; gap:8px; padding:10px 12px; background:rgba(27,37,50,.95); z-index:5; font-size:.8rem; }
+  .stat b { display:block; font-size:1.05rem; } .stat { text-align:center; color:#95a5b8; } .stat b { color:var(--light); }
+  #req b { color:var(--orange); }
+  #totwrap { position:fixed; top:58px; left:12px; right:12px; z-index:5; }
+  #totlabel { font-size:.7rem; letter-spacing:.08em; color:#95a5b8; margin-bottom:3px; }
+  #totbar { height:8px; background:#1b2532; border-radius:4px; overflow:hidden; }
+  #totfill { height:100%; width:0%; background:var(--green); transition:width .25s linear, background .25s; }
+  #floor { position:absolute; inset:92px 0 0 0; }
+  .pkg { position:absolute; width:74px; height:74px; font-size:46px; line-height:74px; text-align:center; cursor:pointer; user-select:none; filter:drop-shadow(0 4px 6px rgba(0,0,0,.5)); }
+  #warn { position:fixed; bottom:18px; left:0; right:0; text-align:center; font-weight:800; color:var(--red); font-size:.95rem; visibility:hidden; letter-spacing:.05em; }
+  /* terminated */
+  #fired { background:#2a0f0a; }
+  #fired h1 { color:#ff6b57; font-size:1.7rem; }
+  .notice { background:#1b2532; border:1px solid #4a2b24; border-radius:8px; padding:18px; max-width:420px; font-size:.92rem; text-align:left; color:#c7d0da; margin-top:16px; line-height:1.5; }
+  .notice em { color:#ff9d8f; font-style:normal; font-weight:700; }
+  #survive { background:#0d2416; }
+  .big { font-size:2.6rem; font-weight:900; color:var(--orange); margin:10px 0; }
+</style>
+</head>
+<body>
+
+<section id="s-join" class="screen on">
+  <h1>📦 Fulfillment Associate Portal</h1>
+  <p class="sub">Welcome to your first shift. Enter your name to receive your associate badge. Productivity expectations apply from the moment your shift begins.</p>
+  <input id="name" maxlength="20" placeholder="First name" autocomplete="off">
+  <button id="joinbtn">Clock in</button>
+  <div class="badge" id="joinerr" style="display:none"></div>
+</section>
+
+<section id="s-wait" class="screen">
+  <h1>🪪 Badge issued</h1>
+  <p class="sub">You're clocked in, <b id="wname"></b>. Keep this screen open — your shift starts when the floor manager opens the round.</p>
+  <div class="badge">Reminder: your scan rate is continuously recorded and compared against facility benchmarks.</div>
+</section>
+
+<section id="s-game" class="screen" style="justify-content:flex-start">
+  <div id="hud">
+    <div class="stat"><b id="picks">0</b>picked</div>
+    <div class="stat" id="req"><b id="reqv">20</b>required/min</div>
+    <div class="stat"><b id="myrate">0</b>your/min</div>
+    <div class="stat"><b id="clock">90</b>sec left</div>
+  </div>
+  <div id="totwrap"><div id="totlabel">TIME OFF TASK</div><div id="totbar"><div id="totfill"></div></div></div>
+  <div id="floor"></div>
+  <div id="warn">⚠ TIME OFF TASK DETECTED — RESUME SCANNING</div>
+</section>
+
+<section id="fired" class="screen">
+  <h1>EMPLOYMENT TERMINATED</h1>
+  <div class="notice">
+    Associate <em id="fname"></em>,<br><br>
+    Your scan rate fell below facility benchmarks. This decision was <em>generated automatically by the productivity system, without input from supervisors</em>.<br><br>
+    Final count: <em id="fpicks"></em> packages.<br>
+    You survived <em id="ftime"></em> seconds.<br><br>
+    This decision is not eligible for appeal. Thank you for your contribution.
+  </div>
+  <p class="sub" style="margin-top:16px">Watch the screen up front — the benchmark keeps rising.</p>
+</section>
+
+<section id="survive" class="screen">
+  <h1>🏆 PERFORMANCE REVIEW: RETAINED</h1>
+  <div class="big" id="spicks"></div>
+  <p class="sub">packages picked. You outworked the algorithm — this round.<br>Note: next quarter's benchmark has been raised to your pace.</p>
+</section>
+
+<script>
+const API = "https://admin.wasihussain.com/cs1151";
+let pid=null, picks=0, lastTap=Date.now(), dead=false, started=false, over=false;
+
+const $ = id => document.getElementById(id);
+const show = id => { document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on")); $(id).classList.add("on"); };
+
+$("joinbtn").onclick = async () => {
+  const name = $("name").value.trim();
+  if (!name) return;
+  try {
+    const r = await fetch(API+"/join", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({name})});
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error||"join failed");
+    pid = d.player_id; $("wname").textContent = name; $("fname").textContent = name;
+    show("s-wait"); poll();
+  } catch(e) {
+    $("joinerr").style.display="block"; $("joinerr").textContent = "Couldn't reach the warehouse. Flag down the presenter.";
+  }
+};
+
+function spawnPkg() {
+  const floor = $("floor");
+  floor.querySelectorAll(".pkg").forEach(e=>e.remove());
+  const el = document.createElement("div");
+  el.className = "pkg"; el.textContent = "📦";
+  const W = floor.clientWidth-80, H = floor.clientHeight-90;
+  el.style.left = (10+Math.random()*W)+"px";
+  el.style.top = (10+Math.random()*H)+"px";
+  const tap = ev => { ev.preventDefault(); if (dead||over) return; picks++; lastTap=Date.now(); $("picks").textContent=picks; spawnPkg(); };
+  el.addEventListener("pointerdown", tap);
+  floor.appendChild(el);
+}
+
+function totLoop() {
+  if (dead||over) return;
+  const idle = (Date.now()-lastTap)/1000;
+  const pct = Math.min(100, idle/2.5*100);
+  $("totfill").style.width = pct+"%";
+  $("totfill").style.background = pct>70 ? "var(--red)" : pct>35 ? "var(--orange)" : "var(--green)";
+  $("warn").style.visibility = pct>=100 ? "visible" : "hidden";
+  if (navigator.vibrate && pct>=100 && Math.floor(idle*2)%2===0) navigator.vibrate(60);
+  requestAnimationFrame(totLoop);
+}
+
+let rateHist = [];
+async function poll() {
+  if (dead) return;
+  try {
+    const r = await fetch(API+"/beat", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({player_id:pid, picks})});
+    const d = await r.json();
+    if (d.running && !started) { started=true; show("s-game"); spawnPkg(); lastTap=Date.now(); totLoop(); }
+    if (started && !d.running && d.over) { over=true; $("spicks").textContent=picks; show(dead?"fired":"survive"); return; }
+    if (d.status === "terminated" && !dead) {
+      dead = true;
+      $("fpicks").textContent = picks;
+      $("ftime").textContent = 90 - d.time_left;
+      if (navigator.vibrate) navigator.vibrate([200,80,200]);
+      show("fired"); return;
+    }
+    $("reqv").textContent = d.required; $("clock").textContent = d.time_left;
+    rateHist.push([Date.now(), picks]); rateHist = rateHist.slice(-8);
+    if (rateHist.length>1) {
+      const [t0,p0]=rateHist[0], [t1,p1]=rateHist[rateHist.length-1];
+      $("myrate").textContent = Math.round((p1-p0)/((t1-t0)/1000)*60);
+    }
+  } catch(e) { /* transient network: keep trying */ }
+  setTimeout(poll, started?1500:2500);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Beat the Rate — Floor Manager</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<style>
+  :root { --navy:#232f3e; --navy2:#37475a; --orange:#ff9900; --light:#eaeded; --red:#ff6b57; --green:#5bd75b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif; background:var(--navy); color:var(--light); min-height:100vh; padding:28px 40px; }
+  header { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:18px; }
+  h1 { font-size:2rem; } h1 span { color:var(--orange); }
+  .controls button { background:var(--orange); color:var(--navy); font-weight:800; border:0; border-radius:999px; padding:12px 26px; font-size:1rem; cursor:pointer; margin-left:10px; }
+  .controls button.ghost { background:transparent; color:#95a5b8; border:1px solid var(--navy2); }
+  main { display:grid; grid-template-columns: 300px 1fr 320px; gap:22px; }
+  .card { background:#1b2532; border-radius:12px; padding:20px; }
+  .card h2 { font-size:.8rem; letter-spacing:.12em; color:var(--orange); margin-bottom:12px; }
+  #qr { background:#fff; padding:14px; width:fit-content; border-radius:8px; margin:0 auto; }
+  .joinurl { text-align:center; margin-top:10px; color:#95a5b8; font-size:.95rem; }
+  .bignum { font-size:4.2rem; font-weight:900; color:var(--orange); text-align:center; line-height:1; }
+  .bignum small { display:block; font-size:.85rem; color:#95a5b8; font-weight:400; letter-spacing:.1em; margin-top:6px; }
+  .duo { display:flex; justify-content:space-around; margin-top:18px; text-align:center; }
+  .duo b { font-size:2rem; display:block; }
+  .duo .dead b { color:var(--red); } .duo .alive b { color:var(--green); }
+  #board { display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:10px; max-height:72vh; overflow:auto; }
+  .pl { background:var(--navy2); border-radius:8px; padding:10px 12px; border-left:4px solid var(--green); }
+  .pl.dead { border-left-color:var(--red); opacity:.55; background:#2a1b17; }
+  .pl .nm { font-weight:700; font-size:.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .pl .st { font-size:.78rem; color:#95a5b8; }
+  #feed { max-height:66vh; overflow:auto; font-size:.9rem; }
+  #feed div { padding:7px 0; border-bottom:1px solid #27354a; color:var(--red); }
+  #clockbar { height:10px; background:#1b2532; border-radius:5px; margin:14px 0 22px; overflow:hidden; }
+  #clockfill { height:100%; width:100%; background:var(--orange); transition:width 1s linear; }
+</style>
+</head>
+<body>
+<header>
+  <h1>📦 BEAT THE <span>RATE</span></h1>
+  <div class="controls">
+    <span id="clock" style="font-size:1.6rem;font-weight:800;margin-right:8px">90s</span>
+    <button id="startbtn">▶ Start shift</button>
+    <button id="resetbtn" class="ghost">Reset</button>
+  </div>
+</header>
+<div id="clockbar"><div id="clockfill"></div></div>
+<main>
+  <div class="card">
+    <h2>CLOCK IN</h2>
+    <div id="qr"></div>
+    <div class="joinurl">wasihussain.com/cs1151</div>
+    <div style="margin-top:26px">
+      <div class="bignum" id="req">20<small>REQUIRED PICKS / MIN</small></div>
+      <div class="duo">
+        <div class="alive"><b id="alive">0</b><span style="color:#95a5b8;font-size:.8rem">EMPLOYED</span></div>
+        <div class="dead"><b id="dead">0</b><span style="color:#95a5b8;font-size:.8rem">TERMINATED</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="card"><h2>THE FLOOR</h2><div id="board"></div></div>
+  <div class="card"><h2>TERMINATION FEED</h2><div id="feed"><div style="color:#95a5b8;border:0">No terminations yet. The system is patient.</div></div></div>
+</main>
+
+<script>
+const API = "https://admin.wasihussain.com/cs1151";
+const KEY = new URLSearchParams(location.search).get("key") || "";
+new QRCode(document.getElementById("qr"), {text:"https://wasihussain.com/cs1151/", width:170, height:170});
+const $ = id => document.getElementById(id);
+let lastFired = 0;
+
+$("startbtn").onclick = () => fetch(API+"/start", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({key:KEY})}).then(r=>r.json()).then(d=>{ if(!d.ok) alert("bad host key — add ?key=... to the URL"); });
+$("resetbtn").onclick = () => { if(confirm("Reset the whole game? Everyone will need to rejoin.")) fetch(API+"/reset", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({key:KEY})}); };
+
+async function tick() {
+  try {
+    const d = await (await fetch(API+"/state")).json();
+    $("req").firstChild.textContent = Math.round(d.required);
+    $("alive").textContent = d.alive;
+    $("dead").textContent = d.total - d.alive;
+    $("clock").textContent = d.time_left + "s";
+    $("clockfill").style.width = (d.time_left/90*100) + "%";
+    $("board").innerHTML = d.players.map(p =>
+      `<div class="pl ${p.status==='terminated'?'dead':''}">
+         <div class="nm">${esc(p.name)}</div>
+         <div class="st">${p.status==='terminated' ? '❌ term @'+Math.round(p.fired_at)+'s' : '📦 '+p.picks+' · '+p.rate+'/min'}</div>
+       </div>`).join("");
+    if (d.fired_order.length > lastFired) {
+      for (let i=lastFired; i<d.fired_order.length; i++)
+        $("feed").insertAdjacentHTML("afterbegin", `<div>❌ ${esc(d.fired_order[i])} — terminated by system. No supervisor input.</div>`);
+      lastFired = d.fired_order.length;
+    }
+    if (d.over && d.total) document.title = "ROUND OVER — " + d.alive + " survived";
+  } catch(e) {}
+  setTimeout(tick, 1000);
+}
+const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+tick();
+</script>
+</body>
+</html>
