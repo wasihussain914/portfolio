@@ -215,9 +215,9 @@ async function tick() {
     $("board").innerHTML = d.players.length ? d.players.map((p,i) =>
       `<div class="row ${p.status==='terminated'?'dead':''}">
          <div class="rank ${i<3?'m':''}">${i<3 ? medals[i] : '#'+(i+1)}</div>
-         <div class="nm">${esc(p.name)}${p.status==='terminated' ? `<small>${REASONS[p.reason]||'terminated'}</small>` : (d.mode==='bombs'&&p.strikes ? `<small>💥 ${p.strikes}/3 injuries</small>`:'')}</div>
+         <div class="nm">${esc(p.name)}<small>Σ ${p.total} total${p.strikes?` · 💥 ${p.strikes}`:''}${p.violations?` · ⚠ ${p.violations} flags`:''}${p.status==='terminated'?` · ${REASONS[p.reason]||'terminated'}`:''}</small></div>
          <div class="picks">${p.picks}</div>
-         <div class="rate">${p.status==='terminated' ? '<b>✖ '+(p.reason==='restructuring'?'laid off':Math.round(p.fired_at||0)+'s')+'</b>' : '<b>'+p.rate+'</b>/min'}</div>
+         <div class="rate">${p.status==='terminated' ? '<b>✖ laid off</b>' : '<b>'+p.rate+'</b>/min'}</div>
        </div>`).join("") : '<div id="empty">Waiting for associates to clock in…</div>';
 
     if (d.fired_order.length > lastFired) {

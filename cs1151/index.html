@@ -168,7 +168,7 @@
     <div class="stat"><b id="picks">0</b><span>PICKED</span></div>
     <div class="stat"><b id="reqv">––</b><span>REQUIRED/MIN</span></div>
     <div class="stat"><b id="myrate">0</b><span>YOUR RATE</span></div>
-    <div class="stat" id="strikestat"><b id="strikes">0/3</b><span>INJURIES</span></div>
+    <div class="stat" id="strikestat"><b id="strikes">0</b><span>INJURIES</span></div>
     <div class="stat"><b id="clock">90</b><span>SECONDS</span></div>
   </div>
   <div id="quotabanner">FULL TRANSPARENCY MODE — QUOTA AND RATCHET RULE ARE PUBLIC</div>
@@ -256,7 +256,7 @@ function spawnThing() {
     if (isBomb) {
       el.classList.add("boom");
       strikes++;
-      $("strikes").textContent = strikes+"/3";
+      $("strikes").textContent = strikes;
       $("injurytoast").style.visibility = "visible";
       document.body.classList.add("redflash");
       if (navigator.vibrate) navigator.vibrate(180);
@@ -317,7 +317,7 @@ async function poll() {
     mode = d.mode || mode;
     if (d.running && !started) {
       started=true; over=false; dead=false; picks=0; strikes=0; rateHist=[];
-      $("picks").textContent="0"; $("strikes").textContent="0/3";
+      $("picks").textContent="0"; $("strikes").textContent="0";
       $("floor").innerHTML=""; show("s-game"); lanes(); spawnThing(); lastTap=Date.now(); totLoop();
       $("strikestat").style.display = mode==="bombs" ? "block" : "none";
       $("quotabanner").style.display = mode==="visible" ? "block" : "none";
