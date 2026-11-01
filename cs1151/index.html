@@ -26,7 +26,6 @@
   .screen.on { display:flex; animation:fadeUp .45s cubic-bezier(.2,.9,.3,1); }
   @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
 
-  /* wordmark */
   .wordmark { font-weight:900; font-size:1.9rem; letter-spacing:-.02em; line-height:1; }
   .wordmark em { font-style:normal; color:var(--orange); }
   .smile { width:120px; margin:4px auto 20px; display:block; }
@@ -49,7 +48,6 @@
   }
   .btn:active { transform:scale(.96); }
 
-  /* badge card */
   .badge {
     background:linear-gradient(160deg, #3b4d63, #2c3a4d); border-radius:16px; padding:22px 26px;
     box-shadow:var(--shadow); max-width:330px; width:100%; margin-top:8px; text-align:left;
@@ -60,7 +58,6 @@
   .badge .nm { font-size:1.5rem; font-weight:800; margin:8px 0 2px; }
   .badge .rl { font-size:.8rem; color:var(--orange2); font-weight:600; margin-bottom:16px; }
   .barcode { height:36px; background:repeating-linear-gradient(90deg,#eaeded 0 2px,transparent 2px 5px,#eaeded 5px 6px,transparent 6px 10px); border-radius:2px; opacity:.85; }
-  .badge.struck .barcode { position:relative; }
   .pulse-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--green); margin-right:7px; animation:blink 1.4s infinite; }
   @keyframes blink { 50% { opacity:.25; } }
   .waitnote { margin-top:22px; font-size:.85rem; color:var(--muted); }
@@ -76,7 +73,13 @@
   .stat span { font-size:.62rem; letter-spacing:.14em; color:var(--muted); font-weight:600; }
   #reqv { color:var(--orange); } #clock.low { color:var(--red); animation:blink 1s infinite; }
   #myrate.danger { color:var(--red); }
+  #strikestat { display:none; } #strikestat b { color:var(--red); }
 
+  #quotabanner {
+    display:none; width:100%; padding:7px; text-align:center; background:rgba(255,153,0,.14);
+    border-bottom:1px solid rgba(255,153,0,.4); color:var(--orange2); font-weight:800; font-size:.8rem;
+    letter-spacing:.08em; z-index:5;
+  }
   #totwrap { width:100%; padding:8px 14px 10px; background:rgba(19,26,34,.92); z-index:5; }
   #totlabel { display:flex; justify-content:space-between; font-size:.62rem; letter-spacing:.14em; color:var(--muted); font-weight:700; margin-bottom:4px; }
   #totbar { height:7px; background:#1b2532; border-radius:4px; overflow:hidden; }
@@ -84,7 +87,7 @@
 
   #floor { position:relative; flex:1; width:100%; overflow:hidden; }
   .lane { position:absolute; left:0; right:0; height:1px; background:rgba(255,255,255,.045); }
-  .pkg {
+  .pkg, .bomb {
     position:absolute; width:84px; height:84px; font-size:52px; line-height:84px; text-align:center;
     cursor:pointer; user-select:none; filter:drop-shadow(0 8px 10px rgba(0,0,0,.45));
     animation:pop .18s cubic-bezier(.2,1.4,.4,1);
@@ -92,9 +95,15 @@
   @keyframes pop { from { transform:scale(.3); opacity:0; } to { transform:scale(1); opacity:1; } }
   .pkg.got { animation:zap .22s forwards; pointer-events:none; }
   @keyframes zap { to { transform:scale(1.6) rotate(10deg); opacity:0; } }
+  .bomb.boom { animation:boom .35s forwards; pointer-events:none; }
+  @keyframes boom { 30% { transform:scale(1.7); } to { transform:scale(.2); opacity:0; } }
   .plus1 { position:absolute; font-weight:900; color:var(--orange); font-size:1.2rem; pointer-events:none; animation:rise .7s forwards; text-shadow:0 2px 6px rgba(0,0,0,.6); }
   @keyframes rise { to { transform:translateY(-46px); opacity:0; } }
-
+  #injurytoast {
+    position:fixed; top:40%; left:50%; transform:translate(-50%,-50%); z-index:7;
+    background:rgba(228,87,61,.92); color:#fff; font-weight:900; font-size:1.1rem; letter-spacing:.1em;
+    padding:14px 26px; border-radius:12px; visibility:hidden; box-shadow:var(--shadow);
+  }
   #ratewarn {
     position:fixed; bottom:16px; left:14px; right:14px; z-index:6; text-align:center;
     background:rgba(228,87,61,.14); border:1px solid rgba(228,87,61,.5); color:#ff9d8f;
@@ -103,11 +112,12 @@
   }
   body.shake { animation:shake .5s; }
   @keyframes shake { 10%,90% {transform:translateX(-2px)} 20%,80% {transform:translateX(3px)} 30%,70% {transform:translateX(-5px)} 40%,60% {transform:translateX(5px)} 50% {transform:translateX(-3px)} }
+  body.redflash::after { content:""; position:fixed; inset:0; background:rgba(228,87,61,.3); z-index:8; pointer-events:none; animation:flashout .4s forwards; }
+  @keyframes flashout { to { opacity:0; } }
 
-  /* terminated */
-  #fired { background:radial-gradient(900px 600px at 50% 0%, #4a1c12 0%, #2a0f0a 55%, #170705 100%); position:relative; }
+  #fired { background:radial-gradient(900px 600px at 50% 0%, #4a1c12 0%, #2a0f0a 55%, #170705 100%); }
   .stamp {
-    font-size:2rem; font-weight:900; color:var(--red); border:5px solid var(--red); border-radius:10px;
+    font-size:1.9rem; font-weight:900; color:var(--red); border:5px solid var(--red); border-radius:10px;
     padding:10px 26px; letter-spacing:.08em; transform:rotate(-8deg) scale(3); opacity:0;
     animation:stamp .5s .25s cubic-bezier(.2,1.1,.3,1) forwards; margin-bottom:22px;
   }
@@ -118,7 +128,6 @@
   }
   .notice em { color:#ff9d8f; font-style:normal; font-weight:700; }
 
-  /* survived */
   #survive { background:radial-gradient(900px 600px at 50% 0%, #11381f 0%, #0d2416 55%, #081209 100%); }
   .big { font-size:3.4rem; font-weight:900; color:var(--orange); margin:8px 0 2px; font-variant-numeric:tabular-nums; }
 
@@ -157,27 +166,25 @@
 <section id="s-game" class="screen">
   <div id="hud">
     <div class="stat"><b id="picks">0</b><span>PICKED</span></div>
-    <div class="stat"><b id="reqv">20</b><span>REQUIRED/MIN</span></div>
+    <div class="stat"><b id="reqv">––</b><span>REQUIRED/MIN</span></div>
     <div class="stat"><b id="myrate">0</b><span>YOUR RATE</span></div>
+    <div class="stat" id="strikestat"><b id="strikes">0/3</b><span>INJURIES</span></div>
     <div class="stat"><b id="clock">90</b><span>SECONDS</span></div>
   </div>
+  <div id="quotabanner">FULL TRANSPARENCY MODE — QUOTA AND RATCHET RULE ARE PUBLIC</div>
   <div id="totwrap">
     <div id="totlabel"><span>TIME OFF TASK</span><span id="totpct">0%</span></div>
     <div id="totbar"><div id="totfill"></div></div>
   </div>
   <div id="floor"></div>
+  <div id="injurytoast">💥 INJURY RECORDED</div>
   <div id="ratewarn">⚠ SCAN RATE BELOW FACILITY BENCHMARK</div>
 </section>
 
 <section id="fired" class="screen">
-  <div class="stamp">TERMINATED</div>
-  <div class="notice">
-    Associate <em id="fname"></em>,<br><br>
-    Your scan rate fell below facility benchmarks. This decision was <em>generated automatically by the productivity system, without input from supervisors.</em><br><br>
-    Final count: <em id="fpicks"></em> packages · survived <em id="ftime"></em>s<br><br>
-    This decision is not eligible for appeal. Thank you for your contribution.
-  </div>
-  <p class="waitnote">Eyes up front — the benchmark is still rising.</p>
+  <div class="stamp" id="stamptext">TERMINATED</div>
+  <div class="notice" id="firednotice"></div>
+  <p class="waitnote">Eyes up front — the floor manager has more to say.</p>
 </section>
 
 <section id="survive" class="screen">
@@ -189,21 +196,38 @@
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <script>
 const API = "https://admin.wasihussain.com/cs1151";
-let pid=null, picks=0, lastTap=Date.now(), dead=false, started=false, over=false, required=20;
+let pid=null, name="", picks=0, strikes=0, lastTap=Date.now(), dead=false, started=false, over=false, mode="classic";
 
 const $ = id => document.getElementById(id);
 const show = id => { document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on")); $(id).classList.add("on"); };
 
+const NOTICES = {
+  rate: n => `Associate <em>${n}</em>,<br><br>Your scan rate fell below facility benchmarks. This decision was <em>generated automatically by the productivity system, without input from supervisors.</em><br><br>Final count: <em>${picks}</em> packages.<br><br>This decision is not eligible for appeal. Thank you for your contribution.`,
+  injury: n => `Associate <em>${n}</em>,<br><br>Following your <em>third recorded safety incident</em>, your employment has been ended. The system has determined the incidents resulted from <em>your failure to exercise due care</em>, not from pace requirements.<br><br>Final count: <em>${picks}</em> packages.<br><br>This decision is not eligible for appeal. Please recover in your own time.`,
+  restructuring: n => `Associate <em>${n}</em>,<br><br>Your position has been <em>eliminated</em> as part of a company-wide efficiency initiative. This is <em>not a reflection of your performance</em> — in fact, you survived every round.<br><br>Company revenue this quarter: <em>+12%</em>.<br><br>We thank you for your contribution and wish you the best in your future endeavors.`,
+};
+const STAMPS = { rate: "TERMINATED", injury: "UNSAFE", restructuring: "LAID OFF" };
+
+function terminateScreen(reason) {
+  dead = true;
+  $("stamptext").textContent = STAMPS[reason] || "TERMINATED";
+  $("firednotice").innerHTML = NOTICES[reason] ? NOTICES[reason](name) : NOTICES.rate(name);
+  if (navigator.vibrate) navigator.vibrate([220,90,220]);
+  document.body.classList.add("shake");
+  setTimeout(()=>document.body.classList.remove("shake"), 600);
+  show("fired");
+}
+
 $("name").addEventListener("keydown", e => { if (e.key==="Enter") $("joinbtn").click(); });
 $("joinbtn").onclick = async () => {
-  const name = $("name").value.trim();
+  name = $("name").value.trim();
   if (!name) { $("name").focus(); return; }
   $("joinbtn").disabled = true;
   try {
     const r = await fetch(API+"/join", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({name})});
     const d = await r.json();
     if (!d.ok) throw 0;
-    pid = d.player_id; $("wname").textContent = name; $("fname").textContent = name;
+    pid = d.player_id; $("wname").textContent = name;
     show("s-wait"); poll();
   } catch(e) {
     $("joinbtn").disabled = false;
@@ -212,24 +236,44 @@ $("joinbtn").onclick = async () => {
   }
 };
 
-function spawnPkg() {
+function spawnThing() {
   const floor = $("floor");
+  const isBomb = mode==="bombs" && Math.random() < 0.22;
   const el = document.createElement("div");
-  el.className = "pkg"; el.textContent = "📦";
+  el.className = isBomb ? "bomb" : "pkg";
+  el.textContent = isBomb ? "💣" : "📦";
   const W = Math.max(floor.clientWidth-96, 40), H = Math.max(floor.clientHeight-110, 40);
   const x = 6+Math.random()*W, y = 6+Math.random()*H;
   el.style.left = x+"px"; el.style.top = y+"px";
+  let expired = false;
+  if (isBomb) {
+    setTimeout(()=>{ if(!el.classList.contains("boom")) { expired=true; el.remove(); } }, 2300);
+  }
   el.addEventListener("pointerdown", ev => {
     ev.preventDefault();
-    if (dead||over||el.classList.contains("got")) return;
-    picks++; lastTap=Date.now(); $("picks").textContent=picks;
-    el.classList.add("got");
-    const p1 = document.createElement("div");
-    p1.className="plus1"; p1.textContent="+1";
-    p1.style.left=(x+28)+"px"; p1.style.top=(y-6)+"px";
-    floor.appendChild(p1);
-    setTimeout(()=>{el.remove(); p1.remove();}, 700);
-    spawnPkg();
+    if (dead||over||expired) return;
+    lastTap = Date.now();
+    if (isBomb) {
+      el.classList.add("boom");
+      strikes++;
+      $("strikes").textContent = strikes+"/3";
+      $("injurytoast").style.visibility = "visible";
+      document.body.classList.add("redflash");
+      if (navigator.vibrate) navigator.vibrate(180);
+      setTimeout(()=>{ $("injurytoast").style.visibility="hidden"; document.body.classList.remove("redflash"); el.remove(); }, 650);
+      beatNow();  // report the strike immediately
+    } else {
+      if (el.classList.contains("got")) return;
+      picks++; $("picks").textContent = picks;
+      el.classList.add("got");
+      const p1 = document.createElement("div");
+      p1.className="plus1"; p1.textContent="+1";
+      p1.style.left=(x+28)+"px"; p1.style.top=(y-6)+"px";
+      floor.appendChild(p1);
+      setTimeout(()=>{el.remove(); p1.remove();}, 700);
+      spawnThing();
+      if (mode==="bombs" && Math.random()<0.3) spawnThing();  // keep floor busy in bombs mode
+    }
   });
   floor.appendChild(el);
 }
@@ -260,39 +304,47 @@ function myRate() {
   return Math.round((p1-p0)/Math.max((t1-t0)/1000,.5)*60);
 }
 
-async function poll() {
-  if (dead) return;
+async function beatNow() {
   try {
-    const r = await fetch(API+"/beat", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({player_id:pid, picks})});
-    const d = await r.json();
-    required = d.required;
-    if (d.running && !started) { started=true; show("s-game"); lanes(); spawnPkg(); lastTap=Date.now(); totLoop(); }
-    if (started && !d.running && d.over) {
-      over=true;
-      if (!dead) { $("spicks").textContent=picks; show("survive");
-        if (window.confetti) { confetti({particleCount:120, spread:75, origin:{y:.65}, colors:["#ff9900","#ffb84d","#eaeded"]}); } }
-      return;
+    const r = await fetch(API+"/beat", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({player_id:pid, picks, strikes})});
+    return await r.json();
+  } catch(e) { return null; }
+}
+
+async function poll() {
+  const d = await beatNow();
+  if (d) {
+    mode = d.mode || mode;
+    if (d.running && !started) {
+      started=true; over=false; dead=false; picks=0; strikes=0; rateHist=[];
+      $("picks").textContent="0"; $("strikes").textContent="0/3";
+      $("floor").innerHTML=""; show("s-game"); lanes(); spawnThing(); lastTap=Date.now(); totLoop();
+      $("strikestat").style.display = mode==="bombs" ? "block" : "none";
+      $("quotabanner").style.display = mode==="visible" ? "block" : "none";
     }
-    if (d.status === "terminated" && !dead) {
-      dead = true;
-      $("fpicks").textContent = picks;
-      $("ftime").textContent = 90 - d.time_left;
-      if (navigator.vibrate) navigator.vibrate([220,90,220]);
-      document.body.classList.add("shake");
-      show("fired"); return;
+    if (!dead && d.status === "terminated") {
+      terminateScreen(d.reason || "rate");
+    } else if (started && !d.running && d.over && !over) {
+      over = true;
+      if (!dead) {
+        $("spicks").textContent = picks; show("survive");
+        if (window.confetti) confetti({particleCount:120, spread:75, origin:{y:.65}, colors:["#ff9900","#ffb84d","#eaeded"]});
+      }
     }
-    if (started) {
-      $("reqv").textContent = Math.round(d.required);
+    if (d.running) over = false;
+    if (started && !dead && !over) {
+      $("reqv").textContent = mode==="classic" ? "––" : Math.round(d.required);
       $("clock").textContent = d.time_left;
       $("clock").classList.toggle("low", d.time_left<=15);
       const mr = myRate();
       $("myrate").textContent = mr;
-      const danger = mr < d.required && (90-d.time_left) > 12;
+      const danger = mode!=="classic" && mr < d.required && (90-d.time_left) > 12;
       $("myrate").classList.toggle("danger", danger);
       $("ratewarn").style.visibility = danger ? "visible" : "hidden";
     }
-  } catch(e) { /* transient network — retry */ }
-  setTimeout(poll, started?1500:2500);
+  }
+  // keep polling even after round end — the restructuring wave can still reach you
+  setTimeout(poll, (started && !over && !dead) ? 1500 : 2800);
 }
 </script>
 </body>
