@@ -273,7 +273,8 @@ function spawnThing() {
       floor.appendChild(p1);
       setTimeout(()=>{el.remove(); p1.remove();}, 700);
       spawnThing();
-      if (mode==="bombs" && Math.random()<0.3) spawnThing();  // keep floor busy in bombs mode
+      if (mode==="bombs" && Math.random()<0.3
+          && document.querySelectorAll('.pkg:not(.got),.bomb:not(.boom)').length < 6) spawnThing();  // busier floor in bombs mode, capped
     }
   });
   floor.appendChild(el);
@@ -340,12 +341,12 @@ async function poll() {
     }
     if (d.running) over = false;
     if (started && !dead && !over) {
-      $("reqv").textContent = mode==="classic" ? "––" : Math.round(d.required);
+      $("reqv").textContent = mode==="visible" ? Math.round(d.required) : "––";  // quota only public in Glass Warehouse
       $("clock").textContent = d.time_left;
       $("clock").classList.toggle("low", d.time_left<=15);
       const mr = myRate();
       $("myrate").textContent = mr;
-      const danger = mode!=="classic" && mr < d.required && ((d.round_secs||90)-d.time_left) > 8;
+      const danger = mode==="visible" && mr < d.required && ((d.round_secs||90)-d.time_left) > 8;
       $("myrate").classList.toggle("danger", danger);
       $("ratewarn").style.visibility = danger ? "visible" : "hidden";
     }
