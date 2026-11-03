@@ -181,7 +181,7 @@ document.querySelectorAll("[data-mode]").forEach(b => b.onclick = () =>
 $("layoffbtn").onclick = () => {
   if (!confirm("Run the restructuring? The bottom half of surviving associates will be laid off.")) return;
   fetch(API+"/layoff", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({key:KEY})})
-  .then(r=>r.json()).then(d=>{ if(!d.ok) alert("Bad host key"); });
+  .then(r=>r.json()).then(d=>{ if(!d.ok) alert(d.error==="round still running" ? "Round is still running — wait for the clock to hit 0, then restructure." : "Bad host key"); });
 };
 
 $("resetbtn").onclick = () => {
