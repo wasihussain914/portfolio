@@ -247,7 +247,7 @@ function spawnThing() {
   el.style.left = x+"px"; el.style.top = y+"px";
   let expired = false;
   if (isBomb) {
-    setTimeout(()=>{ if(!el.classList.contains("boom")) { expired=true; el.remove(); } }, 2300);
+    setTimeout(()=>{ if(!el.classList.contains("boom")) { expired=true; el.remove(); if(!dead&&!over) spawnThing(); } }, 2300);
   }
   el.addEventListener("pointerdown", ev => {
     ev.preventDefault();
@@ -261,6 +261,7 @@ function spawnThing() {
       document.body.classList.add("redflash");
       if (navigator.vibrate) navigator.vibrate(180);
       setTimeout(()=>{ $("injurytoast").style.visibility="hidden"; document.body.classList.remove("redflash"); el.remove(); }, 650);
+      spawnThing();
       beatNow();  // report the strike immediately
     } else {
       if (el.classList.contains("got")) return;
@@ -319,6 +320,11 @@ async function poll() {
       started=true; over=false; dead=false; picks=0; strikes=0; rateHist=[];
       $("picks").textContent="0"; $("strikes").textContent="0";
       $("floor").innerHTML=""; show("s-game"); lanes(); spawnThing(); lastTap=Date.now(); totLoop();
+      clearInterval(window.__floorWatch);
+      window.__floorWatch = setInterval(()=>{
+        if (dead||over) return;
+        if (!document.querySelector(".pkg:not(.got), .bomb:not(.boom)")) spawnThing();
+      }, 1200);
       $("strikestat").style.display = mode==="bombs" ? "block" : "none";
       $("quotabanner").style.display = mode==="visible" ? "block" : "none";
     }
