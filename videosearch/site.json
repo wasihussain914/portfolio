@@ -1,0 +1,23 @@
+{
+  "tagline": "Video semantic search",
+  "description": "Search video by what it shows. Each clip is indexed as keyframes embedded with Amazon Nova; a text query finds the nearest frames. A CDL keyframe-search demo.",
+  "hero": {
+    "workId": "01a1be95-dbb1-7ea4-bac3-52c995e0f0ba",
+    "eyebrow": "Video · keyframes · vector search",
+    "title": "Find a clip by what it shows",
+    "caption": "A rocket launching into a blue sky · MSR-VTT"
+  },
+  "searchSuggestions": ["a rocket launching", "men are doing wrestling", "a photoshop tutorial", "a band performing", "people cheering at a stadium", "a naked child runs through a field", "a dog", "a pizza"],
+  "about": {
+    "title": "About this demo",
+    "body": [
+      "This is the CDL public interface, searching video instead of still images. Each video clip is sampled into keyframes; every frame is embedded with Amazon Nova Multimodal Embeddings (3072-d) and indexed with pgvector. A text query is embedded the same way and matched to the nearest frames, then results collapse to the parent clip.",
+      "The corpus is ~105 public MSR-VTT video clips plus 300 COCO images, loaded into a personal CDL dev stage. Offline, this keyframe approach reached recall@10 of 79% on the 1,000-clip MSR-VTT benchmark — competitive with trained video-retrieval models."
+    ],
+    "sections": [
+      { "heading": "How to read a result", "body": ["Green ‘image’ means the clip matched by its visual content (the vector search), not by keywords. Click a result to see the clip's frames."] }
+    ],
+    "fileSetId": "01a1be98-30e1-7a57-9f95-756c01fa131a"
+  },
+  "notFound": { "fileSetId": "01a1ab1d-bad8-742f-af01-af208dea399b", "caption": "No match" }
+}
