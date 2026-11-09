@@ -1,81 +1,17 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CDL Video Semantic Search — live demo</title>
-<style>
-  :root{--bg:#0d1117;--card:#161b22;--line:#273040;--fg:#e6edf3;--mut:#8b949e;--acc:#4493f8}
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 -apple-system,Segoe UI,Roboto,sans-serif}
-  header{padding:28px 20px 10px;max-width:1040px;margin:0 auto}
-  h1{font-size:22px;margin:0 0 4px}
-  .sub{color:var(--mut);font-size:14px;margin:0 0 18px}
-  .bar{display:flex;gap:8px;max-width:1040px;margin:0 auto;padding:0 20px}
-  input{flex:1;padding:13px 15px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);font-size:16px}
-  button{padding:13px 18px;border-radius:10px;border:0;background:var(--acc);color:#fff;font-weight:600;cursor:pointer;font-size:15px}
-  .chips{max-width:1040px;margin:12px auto 0;padding:0 20px;display:flex;flex-wrap:wrap;gap:8px}
-  .chip{font-size:13px;color:var(--mut);background:var(--card);border:1px solid var(--line);padding:6px 11px;border-radius:999px;cursor:pointer}
-  .chip:hover{color:var(--fg);border-color:var(--acc)}
-  .meta{max-width:1040px;margin:16px auto 0;padding:0 20px;color:var(--mut);font-size:13px;min-height:18px}
-  .grid{max-width:1040px;margin:12px auto 60px;padding:0 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-  .thumb{width:100%;aspect-ratio:4/3;object-fit:cover;background:#0b0f14;display:block}
-  .cap{padding:9px 11px;font-size:13px}
-  .tag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:6px;margin-right:5px}
-  .img{background:#113524;color:#4ade80}.kw{background:#2a1f3d;color:#c084fc}.coco{color:var(--mut)}
-  .rk{color:var(--mut);font-size:12px}
-  a{color:var(--acc);text-decoration:none}
-  footer{max-width:1040px;margin:0 auto 40px;padding:0 20px;color:var(--mut);font-size:12px}
-</style>
-</head>
-<body>
-<header>
-  <h1>CDL Video Semantic Search <span style="color:var(--mut);font-weight:400">· live</span></h1>
-  <p class="sub">Searching <b id="corpus">video clips + images</b> by <b>what they show</b>, not keywords.
-  Each video is indexed as keyframes embedded with Amazon Nova; a text query is matched to the nearest frames. Green = matched by image content.</p>
-</header>
-<div class="bar">
-  <input id="q" placeholder="e.g. a rocket launching into the sky" autofocus>
-  <button onclick="go()">Search</button>
-</div>
-<div class="chips" id="chips"></div>
-<div class="meta" id="meta"></div>
-<div class="grid" id="grid"></div>
-<footer>
-  Live against the CDL <code>dev-coco</code> stage public API. ~105 MSR-VTT video clips (keyframes) + 300 COCO images.
-  Results collapse multiple frames to one video. Content/vector search via Nova Multimodal Embeddings (3072-d) + pgvector HNSW.
-</footer>
-<script>
-const API="https://d265ex29zedegf.cloudfront.net";
-const examples=["a rocket launching into the sky","men are doing wrestling","a woman giving a photoshop tutorial",
-  "a naked child runs through a field","a band performing a rock song","people cheering at a stadium","a dog","a pizza"];
-const chips=document.getElementById('chips');
-examples.forEach(e=>{const c=document.createElement('span');c.className='chip';c.textContent=e;c.onclick=()=>{document.getElementById('q').value=e;go()};chips.appendChild(c)});
-function img(id){return `${API}/iiif/3/${id}/full/max/0/default.jpg`}
-async function go(){
-  const q=document.getElementById('q').value.trim(); if(!q)return;
-  const meta=document.getElementById('meta'), grid=document.getElementById('grid');
-  meta.textContent="searching…"; grid.innerHTML="";
-  const t=performance.now();
-  let d; try{ d=await (await fetch(`${API}/api/v1/search?q=${encodeURIComponent(q)}&limit=24`)).json(); }
-  catch(e){ meta.textContent="error: "+e; return; }
-  const ms=Math.round(performance.now()-t);
-  meta.textContent=`${d.total} results in ${ms} ms`;
-  for(const it of d.items){
-    const m=it.match||{}, fs=m.imageFileSetId||it.representativeFileSetId;
-    const byImg=m.image!=null, isCoco=it.accessionNumber.startsWith('COCO');
-    const card=document.createElement('div');card.className='card';
-    card.innerHTML=`<a href="${API}/api/v1/iiif/manifests/${it.id}" target="_blank">
-      <img class="thumb" loading="lazy" src="${fs?img(fs):''}" alt=""></a>
-      <div class="cap">
-        <span class="tag ${byImg?'img':'kw'}">${byImg?'image':'keyword'}</span>
-        <span class="${isCoco?'coco':''}">${it.accessionNumber}</span>
-        <div class="rk">${byImg?('frame rank '+m.image):''}${m.keyword?(' · kw rank '+m.keyword):''}</div>
-      </div>`;
-    grid.appendChild(card);
-  }
-}
-</script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/videosearch/favicon.svg" type="image/svg+xml" />
+    <title>Digital collections</title>
+    <script type="module" crossorigin src="/videosearch/assets/index-BqGpkfoV.js"></script>
+    <link rel="modulepreload" crossorigin href="/videosearch/assets/jsx-runtime-Dk72oS4N.js">
+    <link rel="modulepreload" crossorigin href="/videosearch/assets/utils-DspcBOkl.js">
+    <link rel="modulepreload" crossorigin href="/videosearch/assets/useControlled-B6rgPMDX.js">
+    <link rel="stylesheet" crossorigin href="/videosearch/assets/index-7GCarIgJ.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
 </html>
